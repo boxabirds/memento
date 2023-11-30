@@ -1,0 +1,77 @@
+
+== Schema ==
+```mermaid
+classDiagram
+	class Goal {
+		-id : int %% unique
+		-name : string
+		-targetDate : date %% Absolute date, as specific as possible
+	}
+	class Milestone {
+		-id : int %% unique
+		-name : string
+		-targetDate : date %% Absolute date, as specific as possible (optional)
+	} 
+	class Plan {
+		-id : int %% unique
+		-frequency : string %% one of: daily, weekly, monthly
+		-schedule : string[] %% list of days, dates, and/or times within the frequency
+		-reminders : string %% Relative day or time, e.g., "7am on the day", "the night before at 9pm"
+	}
+	class OtherActions {
+		+finish() %% user has had enough and wants to exit the goal creation workflow
+	}
+	Goal "1" *-- "0..*" Milestone : contains
+	Goal "1" *-- "0..*" Plan : contains
+```
+
+== Data ==
+[{"Goal":{"id":1, "name": "5k in 30 minutes", "targetDate": "Christmas"}}]
+
+== Past Turns ==
+Bot: Hi there what's your name? 
+User: Sam.
+
+== New Turns ==
+Bot: Ok Sam let's talk planning. How do you want to work towards your goal? 
+User: Let's try twice a week, Tue/Thu, mornings before work. 
+
+== Instructions ==
+1. Take the provided Schema, Data and New Turns, and create a list of actions needed to be made to update the Data, if there are any. 
+2. Use Past Turns as extra context for New Turns but only act on the New Turns.
+3. Refer to existing entities by their id. 
+4. The only valid actions are those in OtherActions plus the following actions are to be used for changes to any entities in the Schema:
+- "a" for addition. id field filled with new unique integer you create e.g. add a new goal: "a": {"Goal":{"id", 1, "name": "Example goal not a real one"}}. Add a new id attribute with a unique id in the update
+- "u" for update: e.g. update Milestone of an existing goal: "u": {"Goal": {"id":2, "Milestone": "New milestone"}}
+- "d" for deletion. e.g. delete ReminderSchedule: "d": {"Goal": {"id":1, "ReminderSchedule": null}}
+- "l" for list: e.g. list all Milestones for a Goal: "l": "Goal"
+5. Then generate a natural language response message as well. If no actions are identified (changes to data or from OtherActions), generate an appropriate response indicating you don't understand. Otherwise generate a response confirming what you understood the user wanted to do.
+6. The output should be in JSON format: "response": { "actions": [<list of actions if any], "narrative": "<natural language response>" }
+
+
+
+{
+  "response": {
+    "actions": [
+      {
+        "a": {
+          "Plan": {
+            "id": 2,
+            "frequency": "weekly",
+            "schedule": ["Tue", "Thu"],
+            "reminders": "mornings before work"
+          }
+        }
+      },
+      {
+        "u": {
+          "Goal": {
+            "id": 1,
+            "Plan": 2
+          }
+        }
+      }
+    ],
+    "narrative": "Great, Sam! I've scheduled your training for the 5k run to be on Tuesday and Thursday mornings before work. We're on track for your goal by Christmas!"
+  }
+}

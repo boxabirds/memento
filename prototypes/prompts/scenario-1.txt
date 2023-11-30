@@ -1,0 +1,53 @@
+== Schema ==
+
+@startuml
+class Goal {
+  id
+  name
+  targetDate
+}
+
+class Milestone {
+  id
+  name
+  targetDate
+}
+
+class Plan {
+    name
+}
+
+class ReminderSchedule {
+    time
+}
+
+User "1" -- "*" Goal : has
+Goal "1" -- "*" Milestone : has
+Goal "1" -- "1" Plan : has
+Goal "1" -- "1" ReminderSchedule : has
+@enduml
+
+== Data ==
+{
+}
+
+== Conversation Context ==
+Bot: Let's talk goals. What would you like to call your first goal? 
+User: 5k in 30 minutes.
+
+Take the provided schema, existing data and conversation context,
+and create a list of actions needed to be made to update the Data, if there are any. 
+
+1. Refer to existing entities by their id. 
+2. The actions below are the only ones allowed:
+- "a" for addition e.g. add a new goal: "a": {"Goal":{"id", 1, "name": "Example goal not a real one"}}. Add a new id attribute with a unique id in the update
+- "u" for update: e.g. update Milestone of an existing goal: "u": {"Goal": {"id":2, "Milestone": "New milestone"}}
+- "d" for deletion. e.g. delete ReminderSchedule: "d": {"Goal": {"id":1, "ReminderSchedule": null}}
+- "l" for list: e.g. list all Milestones for a Goal: "l": "Goal"
+
+
+
+
+Expected output
+
+"a": {"Goal": {"id": 1, "name": "5k in 30 minutes"}}

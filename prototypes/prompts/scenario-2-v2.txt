@@ -1,0 +1,55 @@
+== Schema ==
+
+@startuml
+class Goal {
+  id # unique id
+  name
+  targetDate # Absolute date, as specific as possible
+}
+
+class Milestone {
+  id # unique id
+  name
+  targetDate # Absolute date, as specific as possible (optional)
+}
+
+class Plan {
+  id # unique id
+  frequency # one of: daily, weekly, monthly
+  schedule : String[] # list of days, dates, and/or times within the frequency
+  reminders # Relative day or time, e.g., "10 minutes before", "the night before at 9pm"
+}
+
+Goal "1" *--> "0..*" Milestone : contains
+Goal "1" *--> "0..*" Plan : contains
+@enduml
+
+
+== Data ==
+[{"Goal":{"id":1, "name": "5k in 30 minutes"}}]
+
+== Conversation ==
+Bot: Ok when do you want to reach this goal? 
+User: Christmas.
+
+Take the provided schema, existing data and conversation,
+and create a list of actions needed to be made to update the Data, if there are any. 
+
+1. Refer to existing entities by their id. 
+2. The actions below are the only ones allowed:
+- "a" for addition e.g. add a new goal: "a": {"Goal":{"id", 1, "name": "Example goal not a real one"}}. Add a new id attribute with a unique id in the update
+- "u" for update: e.g. update Milestone of an existing goal: "u": {"Goal": {"id":2, "Milestone": "New milestone"}}
+- "d" for deletion. e.g. delete ReminderSchedule: "d": {"Goal": {"id":1, "ReminderSchedule": null}}
+- "l" for list: e.g. list all Milestones for a Goal: "l": "Goal"
+
+
+
+
+== Expected output ==
+
+[
+  {
+    "u": {"Goal": {"id": 1, "targetDate": "Christmas"}}
+  }
+]
+

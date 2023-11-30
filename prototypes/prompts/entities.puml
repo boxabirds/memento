@@ -1,0 +1,25 @@
+@startuml
+
+class Goal {
+  id # unique id
+  name
+  targetDate # Absolute date, as specific as possible
+}
+
+class Milestone {
+  id # unique id
+  name
+  targetDate # Absolute date, as specific as possible (optional)
+}
+
+class Plan {
+  id # unique id
+  frequency # one of: daily, weekly, monthly
+  schedule : String[] # list of days, dates, and/or times within the frequency
+  reminders # Relative day or time, e.g., "10 minutes before", "the night before at 9pm"
+}
+
+Goal "1" *--> "0..*" Milestone : contains
+Goal "1" *--> "0..*" Plan : contains
+
+@enduml
